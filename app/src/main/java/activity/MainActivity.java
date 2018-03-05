@@ -11,14 +11,21 @@ import com.example.dakshgargas.simplifiedcodingdagger.R;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dashboard.AppController;
 import model.Hero;
 import rest.ApiInterface;
 import rest.ApiClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity {
+
+    @Inject
+    Retrofit retrofit;
 
     ListView listView;
 
@@ -26,12 +33,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //ApiComponent.inject
+        ((AppController) getApplication()).getNetComponent().inject(this);
+
         listView = findViewById(R.id.listViewHeroes);
     }
 
     public void hitIt(View view) {
 
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        //ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = retrofit.create(ApiInterface.class);
 
         Call<List<Hero>> call = apiInterface.getHeros();
 
@@ -39,8 +51,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Hero>> call, Response<List<Hero>> response) {
                 int statusCode = response.code();
-                if(response.body() != null )
-                {
+                if (response.body() != null) {
                     List<Hero> heroList = response.body();
 
                     //Creating an String array for the ListView
@@ -55,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     //displaying the string array into listview
                     listView.setAdapter(new ArrayAdapter<>(getApplicationContext(),
                             android.R.layout.simple_list_item_1, heroes));
-                }else{
+                } else {
 
                 }
 
